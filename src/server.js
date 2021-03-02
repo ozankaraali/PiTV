@@ -6,10 +6,12 @@ import cors from 'cors';
 import { Duplex } from 'stream';
 import { parse } from 'url';
 import os from 'os';
+import { app as electronapp } from 'electron';
+// import fs, {promises} from 'fs';
 
-// import level from 'level'
+import level from 'level'
 import console from 'console';
-// const db = level(electronapp.getPath("userData")+"/settings")
+const db = level(electronapp.getPath("userData")+"/settings")
 
 const expressApp = express()
 const port = 8000
@@ -27,8 +29,8 @@ let options = null
 
 const readFromConfig = async() => {
   try {
-    // url = await db.get('url')
-    // mac = await db.get('mac')
+    url = await db.get('url')
+    mac = await db.get('mac')
 
     options = createOptions (url, mac)
     return JSON.stringify({url: url, mac: mac})
@@ -65,8 +67,8 @@ expressApp.get('/config', async(req, res) => {
 })
 
 expressApp.post('/config', async(req, res) => {
-  // await db.put('url', req.body.url.trim())
-  // await db.put('mac', req.body.mac.trim().toUpperCase())
+  await db.put('url', req.body.url.trim())
+  await db.put('mac', req.body.mac.trim().toUpperCase())
   const isRead = await readFromConfig()
   res.send(isRead)
 })
