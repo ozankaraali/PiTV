@@ -1,0 +1,36 @@
+@import "./node_modules/bulma/bulma.sass";
+@import "./node_modules/bulma-prefers-dark/bulma-prefers-dark.sass";
+
+.vid {
+  -webkit-app-region: drag;
+  position: relative;
+  height: 100vh;
+}
+
+.buttons {
+  padding: 1vh;
+}
+
+.button {
+  -webkit-app-region: no-drag;
+}
+
+.center-absolute {
+  width: 50%;
+  height: 50%;
+  overflow: auto;
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  border: solid black;
+  -webkit-app-region: no-drag;
+}
+
+.modal-background {
+  background-color: rgba(10, 10, 10, 0.86);
+}
+
+.modal-card-body{
+  background-color: #4a4a4a;
+  color: #dbdbdb;
+}

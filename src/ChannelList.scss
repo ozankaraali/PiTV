@@ -1,0 +1,16 @@
+.hover {
+    background-color: #242424;
+}
+
+.menu-content {
+    user-select:none;
+    max-height: 88vh;
+    overflow: auto;
+}
+
+.now-watching {
+    user-select:none;
+    -webkit-app-region: drag;
+    text-align: center;
+    padding: 2vh;
+}
