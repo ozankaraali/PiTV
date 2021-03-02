@@ -6,17 +6,16 @@ import cors from 'cors';
 import { Duplex } from 'stream';
 import { parse } from 'url';
 import os from 'os';
-import { app as electronapp } from 'electron';
 
 // import level from 'level'
 import console from 'console';
 // const db = level(electronapp.getPath("userData")+"/settings")
 
-const app = express()
+const expressApp = express()
 const port = 8000
 
-app.use(json());
-app.use(cors())
+expressApp.use(json());
+expressApp.use(cors())
 
 let url = ""
 let mac = ""
@@ -60,19 +59,19 @@ const createOptions = (url, mac) => {
 
 readFromConfig()
 
-app.get('/config', async(req, res) => {
+expressApp.get('/config', async(req, res) => {
   const isRead = await readFromConfig()
   res.send(isRead)
 })
 
-app.post('/config', async(req, res) => {
+expressApp.post('/config', async(req, res) => {
   // await db.put('url', req.body.url.trim())
   // await db.put('mac', req.body.mac.trim().toUpperCase())
   const isRead = await readFromConfig()
   res.send(isRead)
 })
 
-app.get('/allChannels', async (req, res) => {
+expressApp.get('/allChannels', async (req, res) => {
   if (options != null) {
     // console.log(options)
     const handshake = await fetch(url + '/server/load.php?type=stb&action=handshake', options)
@@ -104,7 +103,7 @@ app.get('/allChannels', async (req, res) => {
 
 })
 
-app.post('/createLink', (req, res) => {
+expressApp.post('/createLink', (req, res) => {
   fetch(url + "/server/load.php?type=itv&action=create_link&cmd=" + req.body['cmd'], options)
     // .then(response => response.text())  
     .then(response => response.json())
@@ -113,7 +112,7 @@ app.post('/createLink', (req, res) => {
 
 })
 
-app.get('/stream/:link*', function (req, res) {
+expressApp.get('/stream/:link*', function (req, res) {
   // console.log(req.query)
   var url_parts = parse(req.url, true);
   var query = "http:" + url_parts.href.split(':')[1] + ":" + url_parts.href.split(':')[2];
@@ -174,6 +173,6 @@ app.get('/stream/:link*', function (req, res) {
 
 })
 
-app.listen(port, () => {
+expressApp.listen(port, () => {
   console.log(`PiTV backend listening at http://localhost:${port}`)
 })

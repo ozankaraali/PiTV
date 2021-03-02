@@ -1,6 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
-// const windowStateKeeper = require('electron-window-state');
+const windowStateKeeper = require('electron-window-state');
 require('./server')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -10,17 +10,17 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 
 const createWindow = () => {
   // Create the browser window.
-  // let mainWindowState = windowStateKeeper({
-  //   defaultWidth: 1280,
-  //   defaultHeight: 720
-  // });
+  let mainWindowState = windowStateKeeper({
+    defaultWidth: 1280,
+    defaultHeight: 720
+  });
 
 
   const mainWindow = new BrowserWindow({
-    // x: mainWindowState.x,
-    // y: mainWindowState.y,
-    width: 1280,//mainWindowState.width,
-    height: 720,//mainWindowState.height,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     frame: false,
     webPreferences: {
       nodeIntegration: true,
@@ -28,13 +28,13 @@ const createWindow = () => {
     }
   });
 
-  // mainWindowState.manage(mainWindow);
+  mainWindowState.manage(mainWindow);
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
