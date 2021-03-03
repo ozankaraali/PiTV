@@ -24,8 +24,7 @@ You need to enter your IPTV provider's details to Settings. When you save, if yo
 
 ## Future Work
 
-- Build the app for Windows
-- Build the app for Linux
+- UI work needed
 
 ## Contributing
 
