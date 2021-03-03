@@ -157,8 +157,11 @@ expressApp.get('/stream/:link*', function (req, res) {
   ]
 
   const osDependentHwAccel = () => {
-    if (os.platform() !== "darwin") {
+    if (os.platform() == "darwin") {
       return inputOptions.push('-hwaccel videotoolbox')
+    }
+    if (os.platform() == "win32") {
+      return inputOptions.push('-hwaccel dxva2')
     }
   }
 

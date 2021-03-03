@@ -20,14 +20,15 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "./icon.icns",
+        "icon": "./icon",
         "asar": true
       },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "pitv"
+            "name": "pitv",
+            "setupIcon": "./icon.ico"
           }
         },
         {
@@ -51,7 +52,10 @@
           "config": {}
         }
       ],
-      "plugins": [["@electron-forge/plugin-auto-unpack-natives"],
+      "plugins": [
+        [
+          "@electron-forge/plugin-auto-unpack-natives"
+        ],
         [
           "@electron-forge/plugin-webpack",
           {
@@ -98,6 +102,7 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-window-state": "^5.0.3",
     "express": "ozankaraali/express",
+    "ffmpeg-static": "^4.2.7",
     "fluent-ffmpeg": "^2.1.2",
     "node-fetch": "^2.6.1",
     "react": "^17.0.1",
