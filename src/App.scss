@@ -34,3 +34,31 @@
   background-color: #4a4a4a;
   color: #dbdbdb;
 }
+
+.ui-button{
+  margin-top: 1.5vw;
+  border: 1px solid #e33e41;
+  border-radius: 50%;
+  display: inline-block;
+  z-index: 3;
+  position: fixed;
+  height: 12px;
+  width: 12px;
+  opacity: 0;
+  font-size: 8pt;
+  text-align: center;
+  vertical-align: center;
+  -webkit-transition: all 0.2s ease;
+}
+.close-button{
+  margin-left: 2vw;
+  background: rgb(239,106,94);
+}
+.minimize-button{
+  margin-left: 6vw;
+  background: rgb(246,189,79);
+}
+.fullscreen-button{
+  margin-left: 10vw;
+  background: rgb(95,195,84);
+}

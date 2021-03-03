@@ -14,6 +14,6 @@ module.exports = {
     new webpack.DefinePlugin({ 'global.GENTLY': false }), 
     new webpack.DefinePlugin({ 'process.env.FLUENTFFMPEG_COV': false})
   ],
-  target: 'node', // in order to ignore built-in modules like path, fs, etc.
-  externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+  target: 'electron-main', // in order to ignore built-in modules like path, fs, etc.
+  // externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 };
