@@ -24,7 +24,7 @@ export default class VideoPlayer extends React.Component {
     return (
       <div>	
         <div data-vjs-player>
-          <video ref={ node => this.videoNode = node } id="my-video" className="video-js center-absolute" controls autoPlay preload="auto" data-setup='{"fluid": true}'></video>
+          <video ref={ node => this.videoNode = node } id="my-video" className="video-js no-drag" controls autoPlay preload="auto" data-setup='{"fluid": true}'></video>
         </div>
       </div>
     )

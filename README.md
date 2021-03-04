@@ -35,7 +35,7 @@ This project is in early phase. If you want to change any function, feel free to
 
 ## License
 
-This software licensed under [MIT](https://github.com/ozankaraali/PiTV/LICENSE).
+This software licensed under [MIT](https://github.com/ozankaraali/PiTV/blob/main/LICENSE).
 
 ## Special Thanks
 
