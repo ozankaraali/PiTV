@@ -42,24 +42,25 @@ function App() {
 
   return (
     <div className="App" id="app">
-      <div className="columns is-gapless is-desktop">
+      <div>
+        <button className="ui-button fullscreen-button" onClick={() => {
+          setFullScreen(remote.getCurrentWindow().fullScreen)
+          remote.getCurrentWindow().setFullScreen(!remote.getCurrentWindow().fullScreen);
+        }}></button>
+        <button className="ui-button minimize-button" onClick={() => {
+          remote.getCurrentWindow().minimize();
+        }}></button>
+        <button className="ui-button close-button" onClick={() => {
+          remote.getCurrentWindow().close();
+        }}></button>
+      </div>
+      <div className="columns is-gapless is-reversed-mobile">
         <ChannelList reload={reload}/>
-        <div className="column vid">
+        <div className="column drag">
           <div>
             <div className="buttons is-right">
               <button className="button is-info" onClick={() => setReload(!reload)}>Reload List</button>
               <button className="button is-primary" onClick={() => toggleModal()}>Settings</button>
-
-              <button className="button is-success" onClick={() => {
-                setFullScreen(remote.getCurrentWindow().fullScreen)
-                remote.getCurrentWindow().setFullScreen(!remote.getCurrentWindow().fullScreen);
-              }}>{fullScreen?"Fullscreen":"Windowed"}</button>
-              <button className="button is-warning" onClick={() => {
-                remote.getCurrentWindow().minimize();
-              }}>Minimize</button>
-              <button className="button is-danger" onClick={() => {
-                remote.getCurrentWindow().close();
-              }}>Close</button>
             </div>
 
             <Modal
@@ -83,7 +84,10 @@ function App() {
               </div>
             </Modal>
           </div>
-          <VideoPlayer />
+          <div class="no-drag center-absolute">
+            <VideoPlayer />
+          </div>
+          
         </div>
       </div>
     </div>

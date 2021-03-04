@@ -1,29 +1,31 @@
 @import "./node_modules/bulma/bulma.sass";
 @import "./node_modules/bulma-prefers-dark/bulma-prefers-dark.sass";
 
-.vid {
-  -webkit-app-region: drag;
-  position: relative;
-  height: 100vh;
+@media(max-width: $tablet) {
+  .columns.is-reversed-mobile {
+    flex-direction: column-reverse;
+    display: flex;
+  }
+}
+
+@media(min-width: $tablet) {
+  .center-absolute {
+    //WE NEED CENTERING
+  }
 }
 
 .buttons {
   padding: 1vh;
 }
 
+.no-drag
+.ui-button
 .button {
   -webkit-app-region: no-drag;
 }
 
-.center-absolute {
-  width: 50%;
-  height: 50%;
-  overflow: auto;
-  margin: auto;
-  position: absolute;
-  top: 0; left: 0; bottom: 0; right: 0;
-  border: solid black;
-  -webkit-app-region: no-drag;
+.drag{
+  -webkit-app-region: drag;
 }
 
 .modal-background {
@@ -36,29 +38,31 @@
 }
 
 .ui-button{
-  margin-top: 1.5vw;
-  border: 1px solid #e33e41;
+  margin: 8px;
+  border: none;
+  background: none;
+  padding: 0;
   border-radius: 50%;
   display: inline-block;
-  z-index: 3;
+  // z-index: 3;
   position: fixed;
   height: 12px;
   width: 12px;
-  opacity: 0;
+  opacity: 1;
   font-size: 8pt;
   text-align: center;
   vertical-align: center;
-  -webkit-transition: all 0.2s ease;
+  // -webkit-transition: all 0.2s ease;
 }
 .close-button{
-  margin-left: 2vw;
+  margin-left: 8px;
   background: rgb(239,106,94);
 }
 .minimize-button{
-  margin-left: 6vw;
+  margin-left: 28px;
   background: rgb(246,189,79);
 }
 .fullscreen-button{
-  margin-left: 10vw;
+  margin-left: 48px;
   background: rgb(95,195,84);
 }
