@@ -43,16 +43,16 @@ function App() {
   return (
     <div className="App" id="app">
       <div>
-        <button className="ui-button fullscreen-button" onClick={() => {
+        <a className="ui-button fullscreen-button" onClick={() => {
           setFullScreen(remote.getCurrentWindow().fullScreen)
           remote.getCurrentWindow().setFullScreen(!remote.getCurrentWindow().fullScreen);
-        }}></button>
-        <button className="ui-button minimize-button" onClick={() => {
+        }}></a>
+        <a className="ui-button minimize-button" onClick={() => {
           remote.getCurrentWindow().minimize();
-        }}></button>
-        <button className="ui-button close-button" onClick={() => {
+        }}></a>
+        <a className="ui-button close-button" onClick={() => {
           remote.getCurrentWindow().close();
-        }}></button>
+        }}></a>
       </div>
       <div className="columns is-gapless is-reversed-mobile">
         <ChannelList reload={reload}/>
