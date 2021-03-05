@@ -7,7 +7,7 @@ import { Duplex } from 'stream';
 import { parse } from 'url';
 import os from 'os';
 import { app as electronapp } from 'electron';
-import fs, {promises} from 'fs';
+import fs from 'fs';
 
 // import level from 'level'
 // import console from 'console';

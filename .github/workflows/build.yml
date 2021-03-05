@@ -2,10 +2,12 @@ name: Build/Release
 
 on:
   push:
-    branches: [ main ]
+    branches: [main, dev]
+    tags:
+      - '*'
 
 jobs:
-  release:
+  build:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -15,19 +17,69 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
-
+        
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
         with:
           node-version: 15.x
+      - run: yarn
+      - run: yarn make
 
-      - name: Build/release Electron app
-        uses: samuelmeuli/action-electron-builder@v1
+      - name: Upload macOS .app
+        uses: actions/upload-artifact@v1
         with:
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.github_token }}
+          name: ${{ matrix.os }}
+          path: out/make/
 
-          # If the commit is tagged with a version (e.g. "v1.0.0"),
-          # release the app after building
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+  create-release:
+    needs: [build]
+    runs-on: "ubuntu-latest"
+    # if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: "macos-latest"
+
+      - name: Download Linux Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: "ubuntu-latest"
+
+      - name: Download MacOS Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: "windows-latest"
+      
+      - name: Make Latest Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        # if: ${{ github.event_name == 'push' }}
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          draft: false
+          prerelease: true
+          files: |
+            windows-latest/**/*
+            ubuntu-latest/**/*
+            macos-latest/**/*
+          title: "PiTV Development Build"
+
+      - name: Extract Tag
+        id: tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo ::set-output name=TAG::${GITHUB_REF#refs/tags/}
+
+      - name: Make Versioned Release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ steps.tag.outputs.TAG }}
+          draft: false
+          prerelease: false
+          files: |
+            windows-latest/**/*
+            ubuntu-latest/**/*
+            macos-latest/**/*
+          title: "PiTV Stable: ${{ steps.tag.outputs.TAG }}"
