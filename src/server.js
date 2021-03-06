@@ -8,10 +8,14 @@ import { parse } from 'url';
 import os from 'os';
 import { app as electronapp } from 'electron';
 import fs from 'fs';
+import ffmpegStatic from 'ffmpeg-static';
+// const ffmpegStaticAsar = ffmpegStatic.replace('app.asar', 'app.asar.unpacked');
 
-// import level from 'level'
+fs.chmodSync(ffmpegStatic, 0o755) 
+
+import level from 'level'
 // import console from 'console';
-// const db = level(electronapp.getPath("userData")+"/settings")
+const db = level(electronapp.getPath("userData")+"/settings")
 
 const expressApp = express()
 const port = 8000
@@ -29,12 +33,12 @@ let options = null
 
 const readFromConfig = async() => {
   try {
-    // url = await db.get('url')
-    // mac = await db.get('mac')
-    let file = fs.readFileSync(electronapp.getPath("userData")+"/conf.json")
-    let jsonfile = JSON.parse(file)
-    url = jsonfile.url
-    mac = jsonfile.mac
+    url = await db.get('url')
+    mac = await db.get('mac')
+    // let file = fs.readFileSync(electronapp.getPath("userData")+"/conf.json")
+    // let jsonfile = JSON.parse(file)
+    // url = jsonfile.url
+    // mac = jsonfile.mac
 
     options = createOptions (url, mac)
     return JSON.stringify({url: url, mac: mac})
@@ -71,15 +75,19 @@ expressApp.get('/config', async(req, res) => {
 })
 
 expressApp.post('/config', async(req, res) => {
-  // await db.put('url', req.body.url.trim())
-  // await db.put('mac', req.body.mac.trim().toUpperCase())
-  let jsondata = JSON.stringify({'url':req.body.url.trim(), 'mac':req.body.mac.trim().toUpperCase()})
-  fs.writeFileSync(electronapp.getPath("userData")+"/conf.json", jsondata, function (err) {
-    if (err) return console.log(err);
-    console.log('Hello World > helloworld.txt');
-  });
+  await db.put('url', req.body.url.trim())
+  await db.put('mac', req.body.mac.trim().toUpperCase())
+  // let jsondata = JSON.stringify({'url':req.body.url.trim(), 'mac':req.body.mac.trim().toUpperCase()})
+  // fs.writeFileSync(electronapp.getPath("userData")+"/conf.json", jsondata, function (err) {
+    // if (err) return console.log(err);
+    // console.log('Hello World > helloworld.txt');
+  // });
   const isRead = await readFromConfig()
   res.send(isRead)
+})
+
+expressApp.get('/ffmpeg', async (req, res) => {
+  res.send(JSON.stringify({"static": ffmpegStatic, "asar": ffmpegStaticAsar}))
 })
 
 expressApp.get('/allChannels', async (req, res) => {
@@ -166,8 +174,10 @@ expressApp.get('/stream/:link*', function (req, res) {
   }
 
   osDependentHwAccel()
-
-  ffmp.inputOptions(inputOptions)
+  
+  ffmp
+    .setFfmpegPath(ffmpegStatic)
+    .inputOptions(inputOptions)
     .outputOptions(outputOptions)
     .format('ismv')
     .on('error', (err) => {
