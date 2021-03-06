@@ -7,7 +7,11 @@ import { Duplex } from 'stream';
 import { parse } from 'url';
 import os from 'os';
 import { app as electronapp } from 'electron';
-// import fs from 'fs';
+import fs from 'fs';
+import ffmpegStatic from 'ffmpeg-static';
+// const ffmpegStaticAsar = ffmpegStatic.replace('app.asar', 'app.asar.unpacked');
+
+fs.chmodSync(ffmpegStatic, 0o755) 
 
 import level from 'level'
 // import console from 'console';
@@ -80,6 +84,10 @@ expressApp.post('/config', async(req, res) => {
   // });
   const isRead = await readFromConfig()
   res.send(isRead)
+})
+
+expressApp.get('/ffmpeg', async (req, res) => {
+  res.send(JSON.stringify({"static": ffmpegStatic, "asar": ffmpegStaticAsar}))
 })
 
 expressApp.get('/allChannels', async (req, res) => {
@@ -166,8 +174,10 @@ expressApp.get('/stream/:link*', function (req, res) {
   }
 
   osDependentHwAccel()
-
-  ffmp.inputOptions(inputOptions)
+  
+  ffmp
+    .setFfmpegPath(ffmpegStatic)
+    .inputOptions(inputOptions)
     .outputOptions(outputOptions)
     .format('ismv')
     .on('error', (err) => {

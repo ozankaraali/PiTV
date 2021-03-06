@@ -4,8 +4,6 @@ A cross-platform STB player client.
 
 ## Installation
 
-You need a FFMPEG installation on your machine
-
 You could download the software from [RELEASES](https://github.com/ozankaraali/PiTV/releases).
 
 Alternatively, you could do:
