@@ -54,42 +54,42 @@ function App() {
           remote.getCurrentWindow().close();
         }}></a>
       </div>
+      <div className="drag"></div>
       <div className="columns is-gapless is-reversed-mobile">
-        <ChannelList reload={reload}/>
-        <div className="column drag">
+        <ChannelList reload={reload} />
+        <div className="column">
           <div>
             <div className="buttons is-right">
-              <button className="button is-info" onClick={() => setReload(!reload)}>Reload List</button>
+              <button className="button is-info first-button" onClick={() => setReload(!reload)}>Reload List</button>
               <button className="button is-primary" onClick={() => toggleModal()}>Settings</button>
             </div>
-
-            <Modal
-              closeModal={() => toggleModal()}
-              saveModal={() => saveData()}
-              modalState={modalState}
-              title="PiTV Settings"
-            >
-              <div>
-                <p>Server URL (http://example.com:1234):</p>
-                <input className="input" type="text" placeholder="Server URL" value={serverUrl} onChange={e => {
-                  setServerUrl(e.target.value)
-                }}></input>
-              </div>
-              <p></p>
-              <div>
-                <p>MAC Address (00:1A:79:xx:xx:xx):</p>
-                <input className="input" type="text" placeholder="MAC Address" value={macAddress} onChange={e => {
-                  setMacAddress(e.target.value)
-                }}></input>
-              </div>
-            </Modal>
           </div>
-          <div class="no-drag center-absolute">
+          <div className="no-drag center-absolute">
             <VideoPlayer />
           </div>
-          
         </div>
       </div>
+
+      <Modal
+        closeModal={() => toggleModal()}
+        saveModal={() => saveData()}
+        modalState={modalState}
+        title="PiTV Settings"
+      >
+        <div>
+          <p>Server URL (http://example.com:1234):</p>
+          <input className="input" type="text" placeholder="Server URL" value={serverUrl} onChange={e => {
+            setServerUrl(e.target.value)
+          }}></input>
+        </div>
+        <p></p>
+        <div>
+          <p>MAC Address (00:1A:79:xx:xx:xx):</p>
+          <input className="input" type="text" placeholder="MAC Address" value={macAddress} onChange={e => {
+            setMacAddress(e.target.value)
+          }}></input>
+        </div>
+      </Modal>
     </div>
   );
 }

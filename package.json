@@ -1,7 +1,7 @@
 {
   "name": "PiTV",
-  "version": "1.0.1",
-  "description": "STB Client",
+  "version": "1.0.2",
+  "description": "A cross-platform STB (IPTV) player client.",
   "main": ".webpack/main",
   "scripts": {
     "start": "electron-forge start",

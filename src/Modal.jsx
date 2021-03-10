@@ -7,7 +7,9 @@ const Modal = ({ children, closeModal, saveModal, modalState, title }) => {
 
   return (
     <div className="modal is-active">
-      <div className="modal-background" onClick={closeModal} />
+      <div className="modal-background"
+      //  onClick={closeModal}
+        />
       <div className="modal-card">
         <header className="modal-card-head">
           <p className="modal-card-title">{title}</p>

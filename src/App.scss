@@ -21,10 +21,13 @@
 .no-drag
 .ui-button
 .button {
-  -webkit-app-region: no-drag;
+  -webkit-app-region: no-drag !important;  
 }
 
 .drag{
+  height: 28px;
+  width: 100%;
+  margin-left: 68px;
   -webkit-app-region: drag;
 }
 
