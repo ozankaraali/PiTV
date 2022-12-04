@@ -8,14 +8,16 @@ import { parse } from 'url';
 import os from 'os';
 import { app as electronapp } from 'electron';
 import fs from 'fs';
-import ffmpegStatic from 'ffmpeg-static';
-// const ffmpegStaticAsar = ffmpegStatic.replace('app.asar', 'app.asar.unpacked');
+import { ClassicLevel } from 'classic-level';
+import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 
+
+const ffmpegStatic = ffmpegInstaller.path.replace('app.asar', 'app.asar.unpacked');
+// fs.copyFileSync(ffmpegStatic, ffmpegStatic);
 fs.chmodSync(ffmpegStatic, 0o755) 
+// const ffmpegStatic = ffmpegInstaller.path
 
-import level from 'level'
-// import console from 'console';
-const db = level(electronapp.getPath("userData")+"/settings")
+const db = new ClassicLevel(electronapp.getPath("userData")+"/settings", { valueEncoding: 'json' });
 
 const expressApp = express()
 const port = 8000

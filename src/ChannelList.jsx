@@ -139,7 +139,7 @@ const ChannelList = ({ reload }) => {
       }}></input>
       <aside className="menu menu-content">
         <ul className="menu-list">
-          {items
+          {Array.from(items)
             .filter(item => inputState === '' || item.name.toLocaleLowerCase().indexOf(inputState.toLocaleLowerCase()) >= 0)
             .map((item, i) => (
               <ListItem

@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const nodeExternals = require('webpack-node-externals');
 module.exports = {
   /**
    * This is the main entry point for your application, it's the first file
@@ -12,8 +11,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({ 'global.GENTLY': false }), 
-    new webpack.DefinePlugin({ 'process.env.FLUENTFFMPEG_COV': false})
+    new webpack.DefinePlugin({ 'process.env.FLUENTFFMPEG_COV': false}),
+    new webpack.NormalModuleReplacementPlugin(/^hexoid$/, require.resolve('hexoid/dist/index.js')),
   ],
-  target: 'electron-main', // in order to ignore built-in modules like path, fs, etc.
-  // externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
 };

@@ -32,40 +32,10 @@
 }
 
 .modal-background {
-  // background-color: rgba(10, 10, 10, 0.86);
+  background-color: rgba(10, 10, 10, 0.86);
 }
 
 .modal-card-body{
-  // background-color: #4a4a4a;
-  // color: #dbdbdb;
-}
-
-.ui-button{
-  margin: 8px;
-  border: none;
-  background: none;
-  padding: 0;
-  border-radius: 50%;
-  display: inline-block;
-  // z-index: 3;
-  position: fixed;
-  height: 12px;
-  width: 12px;
-  opacity: 1;
-  font-size: 8pt;
-  text-align: center;
-  vertical-align: center;
-  // -webkit-transition: all 0.2s ease;
-}
-.close-button{
-  margin-left: 8px;
-  background: rgb(239,106,94);
-}
-.minimize-button{
-  margin-left: 28px;
-  background: rgb(246,189,79);
-}
-.fullscreen-button{
-  margin-left: 48px;
-  background: rgb(95,195,84);
+  background-color: #4a4a4a;
+  color: #dbdbdb;
 }

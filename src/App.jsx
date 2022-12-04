@@ -5,7 +5,7 @@ import Modal from './Modal.jsx';
 import './App.scss';
 import { remote } from 'electron'
 
-function App() {
+const App = () => {
   const [modalState, setModalState] = useState(false)
   const [serverUrl, setServerUrl] = useState("")
   const [macAddress, setMacAddress] = useState("")
@@ -42,18 +42,6 @@ function App() {
 
   return (
     <div className="App" id="app">
-      <div>
-        <a className="ui-button fullscreen-button" onClick={() => {
-          setFullScreen(remote.getCurrentWindow().fullScreen)
-          remote.getCurrentWindow().setFullScreen(!remote.getCurrentWindow().fullScreen);
-        }}></a>
-        <a className="ui-button minimize-button" onClick={() => {
-          remote.getCurrentWindow().minimize();
-        }}></a>
-        <a className="ui-button close-button" onClick={() => {
-          remote.getCurrentWindow().close();
-        }}></a>
-      </div>
       <div className="drag"></div>
       <div className="columns is-gapless is-reversed-mobile">
         <ChannelList reload={reload} />
