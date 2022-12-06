@@ -47,6 +47,7 @@
     "react-dom": "^18.2.0",
     "sass": "^1.56.1",
     "superagent": "^8.0.5",
+    "through2": "^4.0.2",
     "video.js": "^7.20.3"
   }
 }

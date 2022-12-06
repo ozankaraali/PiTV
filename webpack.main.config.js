@@ -9,6 +9,9 @@ module.exports = {
   module: {
     rules: require('./webpack.rules'),
   },
+  experiments: {
+    topLevelAwait: true
+  },
   plugins: [
     new webpack.DefinePlugin({ 'global.GENTLY': false }), 
     new webpack.DefinePlugin({ 'process.env.FLUENTFFMPEG_COV': false}),

@@ -6,9 +6,15 @@ import './App.scss';
 import { remote } from 'electron'
 
 const App = () => {
+  // stb or m3u => if true it is stb, else it is m3u
+  const [stb, setStb] = useState(false)
   const [modalState, setModalState] = useState(false)
-  const [serverUrl, setServerUrl] = useState("")
-  const [macAddress, setMacAddress] = useState("")
+  // take json state as account for the server url and mac address
+  const [currentStbAccount, setCurrentStbAccount] = useState({url: "", mac: ""})
+  const [stbAccounts, setStbAccounts] = useState([])
+
+  // const [serverUrl, setServerUrl] = useState("")
+  // const [macAddress, setMacAddress] = useState("")
   const [fullScreen, setFullScreen] = useState(true)
   const [reload, setReload] = useState(true)
 
