@@ -20,7 +20,7 @@ module.exports = {
     new webpack.DefinePlugin({ 'process.env.FLUENTFFMPEG_COV': false }),
     new CopyPlugin({
       patterns: [
-        'node_modules/ffmpeg-static/ffmpeg'
+        {from: 'node_modules/ffmpeg-static/ffmpeg*', to: '[name][ext]'},
       ],
     }),
     new PermissionsOutputPlugin({
