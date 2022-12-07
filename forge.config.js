@@ -1,12 +1,14 @@
 module.exports = {
   packagerConfig: {
-    icon: "./icon"
+    icon: "./icon",
+    // asar: true,
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
       config: {
+        name: 'pitv',
         setupIcon: './icon.ico'
       },
     },
@@ -28,12 +30,16 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-dmg',
-      config: {
-        format: 'ULFO',
-      },
+      // config: {
+      //   format: 'ULFO',
+      // },
     }
   ],
   plugins: [
+    // {
+    //   name: '@electron-forge/plugin-auto-unpack-natives',
+    //   config: {}
+    // },
     {
       name: '@electron-forge/plugin-webpack',
       config: {

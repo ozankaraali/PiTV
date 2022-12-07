@@ -5,22 +5,12 @@ import cors from 'cors';
 
 import { ClassicLevel } from 'classic-level';
 
-
-import os from 'os';
-import fs from 'fs';
-
 import fetch from 'node-fetch';
-import through2 from 'through2';
-import m3u8Parser from 'm3u8-parser';
-import { get } from 'superagent';
-import { Duplex } from 'stream';
+// import through2 from 'through2';
+// import m3u8Parser from 'm3u8-parser';
 
 import ffm from 'fluent-ffmpeg';
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
-
-const ffmpegStatic = ffmpegInstaller.path.replace('app.asar', 'app.asar.unpacked');
-fs.chmodSync(ffmpegStatic, 0o755);
-ffm.setFfmpegPath(ffmpegStatic);
+import ffmpegStatic from 'ffmpeg-static';
 
 // We will have three options for the server:
 // 1. STB Emulator (default) -> which takes account informations in LevelDB
@@ -36,7 +26,7 @@ ffm.setFfmpegPath(ffmpegStatic);
 // type: STB, M3U, M3U8
 
 const db = new ClassicLevel(
-    electronapp.getPath("userData")+
+    electronapp.getPath("userData") +
     "/settings", { valueEncoding: 'json' }
 );
 
@@ -52,7 +42,7 @@ const randomToken = () => {
     return token;
 }
 
-let token = randomToken();
+let token = await randomToken();
 
 let options = {
     headers: {
@@ -64,10 +54,12 @@ let options = {
 let url = null
 let mac = null
 
-const config = await db.get('config')
 try {
+    const config = await db.get('config')
+
     if (config.data[config.selected].options != undefined) {
         options = config.data[config.selected].options;
+        token = options.headers['Authorization'].split(" ")[1]
     }
     if (config.data[config.selected].url != undefined) {
         url = config.data[config.selected].url;
@@ -82,13 +74,27 @@ catch (e) {
 }
 
 const do_handshake = async (url, mac) => {
-    const handshake = await fetch(url + `/server/load.php?type=stb&action=handshake&prehash=0&token=${this.token}&JsHttpRequest=1-xml`, options)
-    setCookie = await handshake.headers.get('set-cookie')
-    const body = await handshake.json()
-    token = await body.js.token
-    options.headers['Cookie'] = options.headers['Cookie'] + " " + (setCookie ? setCookie.split(";")[0] != null : "")
-    options.headers['Authorization'] = 'Bearer ' + token
-    return options
+    try {
+        console.log("do_handshake", token)
+        const fetchurl = url + `/server/load.php?type=stb&action=handshake&prehash=0&token=${token}&JsHttpRequest=1-xml`
+        console.log("do_handshake", fetchurl)
+        const handshake = await fetch(fetchurl, options)
+        // setCookie = await handshake.headers.get('set-cookie')
+        const body = await handshake.json()
+        console.log("do_handshake_body", body)
+        token = await body.js.token
+        console.log("do_handshake_body", token)
+        // options.headers['Cookie'] = options.headers['Cookie'] + " " + (setCookie ? setCookie.split(";")[0] != null : "")
+        options.headers['Authorization'] = 'Bearer ' + token
+
+        const config = await db.get('config')
+        config.data[config.selected].options = options
+        db.put('config', config);
+        return options
+    }
+    catch (e) {
+        console.log("error", e)
+    }
 }
 
 const createOptions = (urlx, macx) => {
@@ -104,38 +110,38 @@ const createOptions = (urlx, macx) => {
     return options
 }
 
-class Channel {
-    constructor(data) {
-        this.Title = data.Title;
-        this.CMD = data.CMD;
-        this.LogoLink = data.LogoLink;
-        this.Portal = data.Portal;
-        this.GenreID = data.GenreID;
-        this.Genres = data.Genres;
-        this.CMD_ID = data.CMD_ID;
-        this.CMD_CH_ID = data.CMD_CH_ID;
-    }
+// class Channel {
+//     constructor(data) {
+//         this.Title = data.Title;
+//         this.CMD = data.CMD;
+//         this.LogoLink = data.LogoLink;
+//         this.Portal = data.Portal;
+//         this.GenreID = data.GenreID;
+//         this.Genres = data.Genres;
+//         this.CMD_ID = data.CMD_ID;
+//         this.CMD_CH_ID = data.CMD_CH_ID;
+//     }
 
-    async newLink(retry) {
-        fetch(url + `/server/load.php?type=itv&action=create_link&type=itv&cmd=${encodeURIComponent(this.CMD)}&JsHttpRequest=1-xml`, options)
-            // .then(response => response.text())  
-            .then(response => response.json())
-            .then(result => {
-                const strs = result.Js.Cmd.split(' ');
-                res.send(strs[strs.length - 1]);
-            })
-            .catch(error => {
-                console.log('error', error)
-                try {
-                    do_handshake(url, mac)
-                    return this.newLink(true)
-                }
-                catch (error) {
-                    console.log('error', error)
-                }
-            })
-    };
-}
+//     async newLink(retry) {
+//         fetch(url + `/server/load.php?type=itv&action=create_link&type=itv&cmd=${encodeURIComponent(this.CMD)}&JsHttpRequest=1-xml`, options)
+//             // .then(response => response.text())  
+//             .then(response => response.json())
+//             .then(result => {
+//                 const strs = result.Js.Cmd.split(' ');
+//                 res.send(strs[strs.length - 1]);
+//             })
+//             .catch(error => {
+//                 console.log('error', error)
+//                 try {
+//                     do_handshake(url, mac)
+//                     return this.newLink(true)
+//                 }
+//                 catch (error) {
+//                     console.log('error', error)
+//                 }
+//             })
+//     };
+// }
 
 app.get('/allChannels', async (req, res) => {
     if (options != null) {
@@ -165,95 +171,95 @@ app.get('/allChannels', async (req, res) => {
 })
 
 
-const updateChannelList = async (config) => {
-    // get config.selected, see if it is STB or M3U
-    // if STB, then get channel list from STB
-    // if M3U, then get channel list from M3U
+// const updateChannelList = async (config) => {
+//     // get config.selected, see if it is STB or M3U
+//     // if STB, then get channel list from STB
+//     // if M3U, then get channel list from M3U
 
-    const { type } = config.data[config.selected]
+//     const { type } = config.data[config.selected]
 
-    if (type === 'M3U') {
-        const { url } = config.data[config.selected];
-        const { file } = config.data[config.selected];
-        if (url) {
-            // Use the fetch function to retrieve the remote data from the specified URL
-            fetch(url)
-                // Use the response.body property to create a readable stream for the remote data
-                .then(response => response.body)
-                // Use the through2 module to create a transform stream that processes the data from the readable stream
-                .then(stream => stream.pipe(through2(function (chunk, enc, callback) {
-                    // Process the data from the readable stream in this transform stream
+//     if (type === 'M3U') {
+//         const { url } = config.data[config.selected];
+//         const { file } = config.data[config.selected];
+//         if (url) {
+//             // Use the fetch function to retrieve the remote data from the specified URL
+//             fetch(url)
+//                 // Use the response.body property to create a readable stream for the remote data
+//                 .then(response => response.body)
+//                 // Use the through2 module to create a transform stream that processes the data from the readable stream
+//                 .then(stream => stream.pipe(through2(function (chunk, enc, callback) {
+//                     // Process the data from the readable stream in this transform stream
 
-                    // Call the callback function to pass the transformed data to the next stream in the pipeline
-                    callback(null, chunk);
-                })))
-                // Use the through2 module's 'obj' function to create a transform stream that converts the data from the readable stream into JavaScript objects
-                .then(stream => stream.pipe(through2.obj(function (obj, enc, callback) {
-                    // Parse the m3u file using the m3u8-parser module
-                    const parser = new m3u8Parser.Parser();
-                    parser.push(obj);
-                    parser.end();
+//                     // Call the callback function to pass the transformed data to the next stream in the pipeline
+//                     callback(null, chunk);
+//                 })))
+//                 // Use the through2 module's 'obj' function to create a transform stream that converts the data from the readable stream into JavaScript objects
+//                 .then(stream => stream.pipe(through2.obj(function (obj, enc, callback) {
+//                     // Parse the m3u file using the m3u8-parser module
+//                     const parser = new m3u8Parser.Parser();
+//                     parser.push(obj);
+//                     parser.end();
 
-                    // Call the callback function to pass the parsed playlist to the next stream in the pipeline
-                    callback(null, parser.manifest);
-                })))
-                // Use the through2 module's 'map' function to create a transform stream that applies a specified transformation function to each playlist item
-                .then(stream => stream.pipe(through2.obj.map(function (item) {
-                    // Transform each playlist item
+//                     // Call the callback function to pass the parsed playlist to the next stream in the pipeline
+//                     callback(null, parser.manifest);
+//                 })))
+//                 // Use the through2 module's 'map' function to create a transform stream that applies a specified transformation function to each playlist item
+//                 .then(stream => stream.pipe(through2.obj.map(function (item) {
+//                     // Transform each playlist item
 
-                    // Return the transformed item
-                    return item;
-                })))
-                // Use the 'end' event of the transform stream to perform any necessary cleanup or final processing
-                .then(stream => {
-                    stream.on('end', function (playlist) {
-                        // Convert the playlist into a JSON string
-                        const json = JSON.stringify(playlist);
+//                     // Return the transformed item
+//                     return item;
+//                 })))
+//                 // Use the 'end' event of the transform stream to perform any necessary cleanup or final processing
+//                 .then(stream => {
+//                     stream.on('end', function (playlist) {
+//                         // Convert the playlist into a JSON string
+//                         const json = JSON.stringify(playlist);
 
-                        // Write the JSON string to a file in the classic-level database as the value for the 'playlist' key
-                        config.data[config.selected].playlist = json;
-                        db.put('config', config);
-                    });
-                });
-        }
-        else if (file) {
-            // Use the through2 module to create a transform stream that processes the data from the readable stream
-            const stream = fs.createReadStream('playlist.m3u');
+//                         // Write the JSON string to a file in the classic-level database as the value for the 'playlist' key
+//                         config.data[config.selected].playlist = json;
+//                         db.put('config', config);
+//                     });
+//                 });
+//         }
+//         else if (file) {
+//             // Use the through2 module to create a transform stream that processes the data from the readable stream
+//             const stream = fs.createReadStream('playlist.m3u');
 
-            // Use the through2 module to create a transform stream that processes the data from the readable stream
-            const transformer = stream.pipe(through2(function (chunk, enc, callback) {
-                // Process the data from the readable stream in this transform stream
+//             // Use the through2 module to create a transform stream that processes the data from the readable stream
+//             const transformer = stream.pipe(through2(function (chunk, enc, callback) {
+//                 // Process the data from the readable stream in this transform stream
 
-                // Call the callback function to pass the transformed data to the next stream in the pipeline
-                callback(null, chunk);
-            }));
+//                 // Call the callback function to pass the transformed data to the next stream in the pipeline
+//                 callback(null, chunk);
+//             }));
 
-            // Use the through2 module's 'obj' function to create a transform stream that converts the data from the readable stream into JavaScript objects
-            const objTransformer = transformer.pipe(through2.obj(function (obj, enc, callback) {
-                // Parse the m3u file using the m3u8-parser module
-                const parser = new m3u8Parser.Parser();
-                parser.push(obj);
-                parser.end();
+//             // Use the through2 module's 'obj' function to create a transform stream that converts the data from the readable stream into JavaScript objects
+//             const objTransformer = transformer.pipe(through2.obj(function (obj, enc, callback) {
+//                 // Parse the m3u file using the m3u8-parser module
+//                 const parser = new m3u8Parser.Parser();
+//                 parser.push(obj);
+//                 parser.end();
 
-                // Call the callback function to pass the parsed playlist to the next stream in the pipeline
-                callback(null, parser.manifest);
-            }));
+//                 // Call the callback function to pass the parsed playlist to the next stream in the pipeline
+//                 callback(null, parser.manifest);
+//             }));
 
-            // Use the 'end' event of the transform stream to perform any necessary cleanup or final processing
-            objTransformer.on('end', function (playlist) {
-                // Convert the playlist into a JSON string
-                const json = JSON.stringify(playlist);
+//             // Use the 'end' event of the transform stream to perform any necessary cleanup or final processing
+//             objTransformer.on('end', function (playlist) {
+//                 // Convert the playlist into a JSON string
+//                 const json = JSON.stringify(playlist);
 
-                // Write the JSON string to a file in the classic-level database as the value for the 'playlist' key
-                config.data[config.selected].playlist = json;
-                db.put('config', config);
-            });
-        }
-    }
-    if (type === 'STB') {
+//                 // Write the JSON string to a file in the classic-level database as the value for the 'playlist' key
+//                 config.data[config.selected].playlist = json;
+//                 db.put('config', config);
+//             });
+//         }
+//     }
+//     if (type === 'STB') {
 
-    }
-}
+//     }
+// }
 
 app.use(json());
 app.use(cors());
@@ -343,37 +349,18 @@ app.get('/channels', async (req, res) => {
         const { type, url } = config.data[config.selected];
         if (type === 'STB') {
             const { channel_list } = config.data[config.selected];
+            do_handshake(url, mac);
             res.send(channel_list);
         } else if (type === 'M3U') {
             const { data } = config.data[config.selected];
             res.send(data);
         }
     } catch (err) {
+        console.log(err)
         res.send([]);
     }
 }
 );
-
-// const newLink = (retry, cmd) => {
-//     fetch(url + `/server/load.php?type=itv&action=create_link&type=itv&cmd=${encodeURIComponent(cmd)}&JsHttpRequest=1-xml`, options)
-//     // .then(response => response.text())  
-//     .then(response => response.json())
-//     .then(result => {
-//         const strs = result.js.cmd.split(' ');
-//         return strs[strs.length - 1];
-//     })
-//     .then (link => { link })
-//     .catch(error => {
-//         console.log('error', error)
-//         try {
-//             do_handshake(url, mac)
-//             return this.newLink(true)
-//         }
-//         catch (error) {
-//             console.log('error', error)
-//         }
-//     }) 
-// };
 
 let callCounter = 0;
 
@@ -416,44 +403,40 @@ app.get('/stream/:link*', function (req, res) {
     const match = input.match(regex);
     const urlInTheParam = match[1];
 
-    const inStream = new Duplex({
-        write(chunk, encoding, callback) {
-            inStream.push(chunk)
-            callback();
-        },
-
-        read(size) {
-
-        }
-    });
-
-    get(urlInTheParam)
-        .set(options.headers)
-        .on('error', (error) => {
-            console.log("req.error", error)
-        })
-        .pipe(inStream)
-
-    let ffmp = ffm(inStream)
+    let ffmp = ffm(urlInTheParam)
 
     let inputOptions = ['-re',
-                        '-hwaccel auto', // Use hardware acceleration, if available
+        '-hwaccel auto', // Use hardware acceleration, if available
     ]
     let outputOptions = [
         '-reconnect 1',
         '-reconnect_at_eof 1',
         '-timeout 100000000',
         '-reconnect_streamed 1',
-        '-max_muxing_queue_size 9999',
-        '-b:v 3000k', // Set the video bitrate to 1000 kilobits per second
-        '-preset veryfast', // Use a lower-complexity encoding preset
-        '-threads 2', // Limit ffmpeg to using 2 threads
-        '-hls_time 10', // Limit each output segment to 10 seconds
-        // '-movflags +isml+frag_keyframe+faststart',
-        // '-preset ultrafast',
-        // '-movflags +isml+frag_keyframe+faststart',
-        '-bufsize 6000k',
-        '-movflags +isml+frag_keyframe+faststart', //
+        '-acodec aac',
+        '-ac 2',
+        // '-ab 64k',
+        // '-vcodec libx264 -preset ultrafast -crf 23 -threads 0',
+        '-vcodec libx264',
+        '-preset ultrafast',
+        // '-g 100', 
+        // '-keyint_min 100',
+        // '-x264opts pic-struct:no-scenecut', 
+        // '-movflags frag_keyframe',
+        // '-b 400k', 
+        // '-s 640x480',
+        '-tune zerolatency',
+
+        // '-max_muxing_queue_size 9999',
+        // '-b:v 3000k', // Set the video bitrate to 1000 kilobits per second
+        // '-preset medium', // Use a lower-complexity encoding preset
+        // // '-threads 2', // Limit ffmpeg to using 2 threads
+        // '-hls_time 10', // Limit each output segment to 10 seconds
+        // // '-movflags +isml+frag_keyframe+faststart',
+        // // '-preset ultrafast',
+        '-movflags +isml+frag_keyframe+faststart',
+        // '-bufsize 12000k',
+        // '-movflags +isml+frag_keyframe', //
     ]
 
     ffmp
@@ -468,11 +451,6 @@ app.get('/stream/:link*', function (req, res) {
             console.log('ffmpeg end', err)
         })
         .pipe(res)
-
-    res.once('close', function (err) {
-        console.log('close')
-        ffmp.kill('SIGINT')
-    });
 })
 
 

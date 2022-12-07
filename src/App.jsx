@@ -3,18 +3,20 @@ import ChannelList from './ChannelList.jsx';
 import VideoPlayer from './VideoPlayer.jsx';
 import Modal from './Modal.jsx';
 import './App.scss';
-import { remote } from 'electron'
 
 const App = () => {
   // stb or m3u => if true it is stb, else it is m3u
   const [stb, setStb] = useState(false)
   const [modalState, setModalState] = useState(false)
   // take json state as account for the server url and mac address
-  const [currentStbAccount, setCurrentStbAccount] = useState({url: "", mac: ""})
+  const [currentStbAccount, setCurrentStbAccount] = useState({ url: "", mac: "" })
   const [stbAccounts, setStbAccounts] = useState([])
 
-  // const [serverUrl, setServerUrl] = useState("")
-  // const [macAddress, setMacAddress] = useState("")
+  // get selected channel from channelList
+  const [selectedChannel, setSelectedChannel] = useState(undefined)
+
+  const [serverUrl, setServerUrl] = useState("")
+  const [macAddress, setMacAddress] = useState("")
   const [fullScreen, setFullScreen] = useState(true)
   const [reload, setReload] = useState(true)
 
@@ -29,8 +31,8 @@ const App = () => {
   const loadData = async () => {
     const response = await fetch("http://localhost:8000/config")
     const data = await response.json()
-    setMacAddress(data.mac)
-    setServerUrl(data.url)
+    setMacAddress(data.data[0].mac)
+    setServerUrl(data.data[0].url)
   }
 
   const saveData = async () => {
@@ -39,7 +41,14 @@ const App = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 'url': serverUrl, 'mac': macAddress })
+      body: JSON.stringify({
+        "selected": 0,
+        "data": [
+          { "type": "STB", "url": serverUrl, "mac": macAddress },
+          { "type": "STB", "url": "", "mac": "00:1A:79:xx:xx:xx", "channel_list": [] },
+          { "type": "M3U8", "url": "" }
+        ]
+      })
     })
     const data = await response.json()
     setReload(!reload)

@@ -70,23 +70,13 @@ const ChannelList = ({ reload }) => {
 
   const updateSelected = async (item) => {
     const link = await create_link(item.cmd)
-    item.videoLink = "http://localhost:8000/stream/" + link.split(" ")[1]
-    console.log(item.videoLink)
+    item.videoLink = "http://localhost:8000/stream/" + link
     setSelected(item)
 
     const player = videojs(document.querySelector('video'));
     player.src({ src: item.videoLink, type: "video/mp4" })
     player.load();
     player.play();
-
-    // player.on('error', function() {
-    //     player.load();
-    //     player.play();
-    // });
-    // player.on('ended', function() {
-    //     player.load();
-    //     player.play();
-    // });
   }
 
   useEffect(() => {
@@ -112,10 +102,17 @@ const ChannelList = ({ reload }) => {
     }
   }, [hovered]); //HOVERED CURSOR
 
-  useEffect(() => {
-    // mainRef.current.focus();
-    loadData();
-  }, [])
+  // useEffect(() => {
+  //   // mainRef.current.focus();
+  //   // loadDataDB();
+  // }, [])
+
+  // const loadDataDB = async () => {
+  //   const response = await fetch("http://localhost:8000/channels")
+  //   const data = await response.json()
+  //   setItems(data)
+  //   // console.log(data)
+  // }
 
   useEffect(() => {
     setItems([]) // user should not see old channel list
