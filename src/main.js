@@ -2,9 +2,7 @@ const { app, BrowserWindow, protocol } = require('electron');
 const path = require('path');
 require('./server')
 
-// if (require('electron-squirrel-startup')) {
-//   app.quit();
-// }
+if (require('electron-squirrel-startup')) app.quit();
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 protocol.registerSchemesAsPrivileged([
@@ -27,13 +25,19 @@ const createWindow = () => {
       allowRunningInsecureContent: true,
       enableRemoteModule: true
     },
+    show: false
   });
+
+  mainWindow.removeMenu();
+  mainWindow.maximize();
 
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools();
+
+  mainWindow.show();
 };
 
 // This method will be called when Electron has finished
