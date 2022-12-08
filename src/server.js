@@ -446,9 +446,11 @@ app.get('/stream/:link*', function (req, res) {
         .format('ismv')
         .on('error', (err) => {
             console.log('ffmpeg error', err)
+            ffmp.kill()
         })
         .on('end', (err) => {
             console.log('ffmpeg end', err)
+            ffmp.kill()
         })
         .pipe(res)
 })
