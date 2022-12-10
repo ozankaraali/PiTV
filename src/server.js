@@ -1,6 +1,6 @@
 import { app as electronapp } from 'electron';
 
-import express, { json } from 'express';
+import express, { json, response } from 'express';
 import cors from 'cors';
 
 import { ClassicLevel } from 'classic-level';
@@ -8,6 +8,7 @@ import { ClassicLevel } from 'classic-level';
 import fetch from 'node-fetch';
 // import through2 from 'through2';
 // import m3u8Parser from 'm3u8-parser';
+import fs from 'fs';
 
 import ffm from 'fluent-ffmpeg';
 import ffmpegStatic from 'ffmpeg-static';
@@ -22,8 +23,35 @@ import ffmpegStatic from 'ffmpeg-static';
 // /config -> GET, POST
 // which reads and updates the account info in LevelDB
 
-// example json: {"selected": 0, "data": [{"type": "M3U", "url": "", "file":"", "playlist": ""}, {"type": "STB", "url": "", "mac": "00:1A:79:xx:xx:xx", "channel_list": []}, {"type": "M3U8", "url": ""}]}
-// type: STB, M3U, M3U8
+// example json:
+// const config = {
+//     "selected": 0,
+//     "data": [
+//         {
+//             "type": "STB",
+//             "url": "http://<URL>:8080",
+//             "mac": "00:1A:79:XX:XX:XX",
+//             "options": {
+//                 "headers": {
+//                     "User-Agent": "Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3",
+//                     "Accept-Charset": "UTF-8,*;q=0.8",
+//                     "X-User-Agent": "Model: MAG200; Link: Ethernet",
+//                     "Host": "<URL>:8080",
+//                     "Range": "bytes=0-",
+//                     "Accept": "*/*",
+//                     "Referer": "http://<URL>:8080/c/",
+//                     "Cookie": "mac=00:1A:79:XX:XX:XX; stb_lang=en; timezone=Europe/Kiev; PHPSESSID=null;",
+//                     "Authorization": "Bearer BCBDCB9B964117452284FBA63771333A"
+//                 }
+//             }
+//         },
+//         {
+//             "type": "M3UPLAYLIST",
+//             "url": "https://iptv-org.github.io/iptv/index.m3u"
+//         }
+//     ]
+// }
+// type: STB, M3UPLAYLIST, M3USTREAM
 
 const db = new ClassicLevel(
     electronapp.getPath("userData") +
@@ -75,15 +103,11 @@ catch (e) {
 
 const do_handshake = async (url, mac) => {
     try {
-        console.log("do_handshake", token)
         const fetchurl = url + `/server/load.php?type=stb&action=handshake&prehash=0&token=${token}&JsHttpRequest=1-xml`
-        console.log("do_handshake", fetchurl)
         const handshake = await fetch(fetchurl, options)
         // setCookie = await handshake.headers.get('set-cookie')
         const body = await handshake.json()
-        console.log("do_handshake_body", body)
         token = await body.js.token
-        console.log("do_handshake_body", token)
         // options.headers['Cookie'] = options.headers['Cookie'] + " " + (setCookie ? setCookie.split(";")[0] != null : "")
         options.headers['Authorization'] = 'Bearer ' + token
 
@@ -110,157 +134,6 @@ const createOptions = (urlx, macx) => {
     return options
 }
 
-// class Channel {
-//     constructor(data) {
-//         this.Title = data.Title;
-//         this.CMD = data.CMD;
-//         this.LogoLink = data.LogoLink;
-//         this.Portal = data.Portal;
-//         this.GenreID = data.GenreID;
-//         this.Genres = data.Genres;
-//         this.CMD_ID = data.CMD_ID;
-//         this.CMD_CH_ID = data.CMD_CH_ID;
-//     }
-
-//     async newLink(retry) {
-//         fetch(url + `/server/load.php?type=itv&action=create_link&type=itv&cmd=${encodeURIComponent(this.CMD)}&JsHttpRequest=1-xml`, options)
-//             // .then(response => response.text())  
-//             .then(response => response.json())
-//             .then(result => {
-//                 const strs = result.Js.Cmd.split(' ');
-//                 res.send(strs[strs.length - 1]);
-//             })
-//             .catch(error => {
-//                 console.log('error', error)
-//                 try {
-//                     do_handshake(url, mac)
-//                     return this.newLink(true)
-//                 }
-//                 catch (error) {
-//                     console.log('error', error)
-//                 }
-//             })
-//     };
-// }
-
-app.get('/allChannels', async (req, res) => {
-    if (options != null) {
-        // console.log(options)
-        console.log(url, mac)
-        do_handshake(url, mac)
-        // ALL CHANNELS WON'T RETURN UNLESS PROFILE
-        await fetch(url + '/server/load.php?type=stb&action=get_profile&stb_type=MAG250&sn=0000000000000&ver=ImageDescription%3a%200.2.16-250%3b%20ImageDate%3a%2018%20Mar%202013%2019%3a56%3a53%20GMT%2b0200%3b%20PORTAL%20version%3a%204.9.9%3b%20API%20Version%3a%20JS%20API%20version%3a%20328%3b%20STB%20API%20version%3a%20134%3b%20Player%20Engine%20version%3a%200x566&not_valid_token=0&auth_second_step=0&hd=1&num_banks=1&image_version=216&hw_version=1.7-BD-00', options)
-        // .then(response => response.json())
-        // .then(result => { console.log(result) })
-
-        const frt = (i) => {
-            if (i < 30) {
-                fetch(url + "/server/load.php?type=itv&action=get_all_channels", options)
-                    // .then(response => response.text())  
-                    .then(response => response.json())
-                    .then(result => res.send(result.js.data))
-                    .catch(error => { frt(i + 1) });
-            }
-        }
-
-        frt(0)
-    } else {
-        res.send([])
-    }
-
-})
-
-
-// const updateChannelList = async (config) => {
-//     // get config.selected, see if it is STB or M3U
-//     // if STB, then get channel list from STB
-//     // if M3U, then get channel list from M3U
-
-//     const { type } = config.data[config.selected]
-
-//     if (type === 'M3U') {
-//         const { url } = config.data[config.selected];
-//         const { file } = config.data[config.selected];
-//         if (url) {
-//             // Use the fetch function to retrieve the remote data from the specified URL
-//             fetch(url)
-//                 // Use the response.body property to create a readable stream for the remote data
-//                 .then(response => response.body)
-//                 // Use the through2 module to create a transform stream that processes the data from the readable stream
-//                 .then(stream => stream.pipe(through2(function (chunk, enc, callback) {
-//                     // Process the data from the readable stream in this transform stream
-
-//                     // Call the callback function to pass the transformed data to the next stream in the pipeline
-//                     callback(null, chunk);
-//                 })))
-//                 // Use the through2 module's 'obj' function to create a transform stream that converts the data from the readable stream into JavaScript objects
-//                 .then(stream => stream.pipe(through2.obj(function (obj, enc, callback) {
-//                     // Parse the m3u file using the m3u8-parser module
-//                     const parser = new m3u8Parser.Parser();
-//                     parser.push(obj);
-//                     parser.end();
-
-//                     // Call the callback function to pass the parsed playlist to the next stream in the pipeline
-//                     callback(null, parser.manifest);
-//                 })))
-//                 // Use the through2 module's 'map' function to create a transform stream that applies a specified transformation function to each playlist item
-//                 .then(stream => stream.pipe(through2.obj.map(function (item) {
-//                     // Transform each playlist item
-
-//                     // Return the transformed item
-//                     return item;
-//                 })))
-//                 // Use the 'end' event of the transform stream to perform any necessary cleanup or final processing
-//                 .then(stream => {
-//                     stream.on('end', function (playlist) {
-//                         // Convert the playlist into a JSON string
-//                         const json = JSON.stringify(playlist);
-
-//                         // Write the JSON string to a file in the classic-level database as the value for the 'playlist' key
-//                         config.data[config.selected].playlist = json;
-//                         db.put('config', config);
-//                     });
-//                 });
-//         }
-//         else if (file) {
-//             // Use the through2 module to create a transform stream that processes the data from the readable stream
-//             const stream = fs.createReadStream('playlist.m3u');
-
-//             // Use the through2 module to create a transform stream that processes the data from the readable stream
-//             const transformer = stream.pipe(through2(function (chunk, enc, callback) {
-//                 // Process the data from the readable stream in this transform stream
-
-//                 // Call the callback function to pass the transformed data to the next stream in the pipeline
-//                 callback(null, chunk);
-//             }));
-
-//             // Use the through2 module's 'obj' function to create a transform stream that converts the data from the readable stream into JavaScript objects
-//             const objTransformer = transformer.pipe(through2.obj(function (obj, enc, callback) {
-//                 // Parse the m3u file using the m3u8-parser module
-//                 const parser = new m3u8Parser.Parser();
-//                 parser.push(obj);
-//                 parser.end();
-
-//                 // Call the callback function to pass the parsed playlist to the next stream in the pipeline
-//                 callback(null, parser.manifest);
-//             }));
-
-//             // Use the 'end' event of the transform stream to perform any necessary cleanup or final processing
-//             objTransformer.on('end', function (playlist) {
-//                 // Convert the playlist into a JSON string
-//                 const json = JSON.stringify(playlist);
-
-//                 // Write the JSON string to a file in the classic-level database as the value for the 'playlist' key
-//                 config.data[config.selected].playlist = json;
-//                 db.put('config', config);
-//             });
-//         }
-//     }
-//     if (type === 'STB') {
-
-//     }
-// }
-
 app.use(json());
 app.use(cors());
 
@@ -270,9 +143,8 @@ app.get('/config', async (req, res) => {
 
         if (config.data[config.selected].type === 'STB') {
             createOptions(config.data[config.selected].url, config.data[config.selected].mac);
+            config.data[config.selected].options = options;
         }
-
-        config.data[config.selected].options = options;
 
         res.send(config);
     } catch (err) {
@@ -287,9 +159,8 @@ app.post('/config', async (req, res) => {
 
         if (config.data[config.selected].type === 'STB') {
             createOptions(config.data[config.selected].url, config.data[config.selected].mac);
+            config.data[config.selected].options = options;
         }
-
-        config.data[config.selected].options = options;
 
         await db.put('config', config);
         // updateChannelList(req.body);
@@ -343,6 +214,113 @@ app.post('/select', async (req, res) => {
 }
 );
 
+const parseM3U = (data) => {
+    const lines = data.split(/\r?\n/);
+    // Create a new array to hold the parsed data
+    const result = [];
+    // Create a new object to hold the current channel
+    let channel = {};
+    // Loop through each line
+    let id = 0;
+    lines.forEach((line) => {
+        // If the line starts with #EXTINF, then parse the channel information
+        if (line.startsWith('#EXTINF')) {
+            // Split the line into parts
+            // const parts = line.split(',');
+            const tvgIdMatch = line.match(/tvg-id="([^"]+)"/);
+            const tvgLogoMatch = line.match(/tvg-logo="([^"]+)"/);
+            const groupTitleMatch = line.match(/group-title="([^"]+)"/);
+            const channelNameMatch = line.match(/,(.+)/);
+
+            // Get the tvg-id and tvg-logo values
+            const tvgId = tvgIdMatch ? tvgIdMatch[1] : null;
+            const tvgLogo = tvgLogoMatch ? tvgLogoMatch[1] : null;
+            // Get the group-title value
+            const groupTitle = groupTitleMatch ? groupTitleMatch[1] : null;
+            // Get the channel name
+            const channelName = channelNameMatch ? channelNameMatch[1] : null;
+
+            // Extract the channel number
+            // const number = parts[0].split(':')[1];
+            id++;
+            // Extract the channel name
+            const name = channelName//parts[1];
+            // Create a new channel object
+            channel = { id, name };
+        }
+        // If the line is a URL, then add it to the channel object
+        else if (line.startsWith('http')) {
+            channel.cmd = line;
+            // Push the channel object to the result array
+            result.push(channel);
+        }
+    }
+    );
+    // Return the parsed data
+    return result;
+}
+
+app.get('/allChannels', async (req, res) => {
+    const config = await db.get('config');
+    const { type } = config.data[config.selected];
+    if (type === 'STB') {
+        if (options != null) {
+            console.log(url, mac)
+            do_handshake(url, mac)
+            // ALL CHANNELS WON'T RETURN UNLESS PROFILE
+            await fetch(url + '/server/load.php?type=stb&action=get_profile&stb_type=MAG250&sn=0000000000000&ver=ImageDescription%3a%200.2.16-250%3b%20ImageDate%3a%2018%20Mar%202013%2019%3a56%3a53%20GMT%2b0200%3b%20PORTAL%20version%3a%204.9.9%3b%20API%20Version%3a%20JS%20API%20version%3a%20328%3b%20STB%20API%20version%3a%20134%3b%20Player%20Engine%20version%3a%200x566&not_valid_token=0&auth_second_step=0&hd=1&num_banks=1&image_version=216&hw_version=1.7-BD-00', options)
+
+            const force_retry = (i) => {
+                if (i < 30) {
+                    fetch(url + "/server/load.php?type=itv&action=get_all_channels", options)
+                        // .then(response => response.text())  
+                        .then(response => response.json())
+                        .then(result => res.send(result.js.data))
+                        .catch(error => { force_retry(i + 1) });
+                }
+            }
+            force_retry(0)
+        } else {
+            res.send([])
+        }
+    } else if (type === 'M3UPLAYLIST') {
+        const { url } = config.data[config.selected];
+        const { file } = config.data[config.selected];
+        if (url) {
+            // Use the fetch function to retrieve the remote data from the specified URL
+            const response = await fetch(url);
+            // Use the text() function to retrieve the raw text from the response
+            const data = await response.text();
+            // Split the text into lines
+            const result = parseM3U(data);
+            // Return the result array
+            config.data[config.selected].data = result;
+            await db.put('config', config);
+            res.send(result);
+
+        }
+        else if (file) {
+            const data = fs.readFileSync(file, 'utf8');
+            const result = parseM3U(data);
+            config.data[config.selected].data = result;
+            await db.put('config', config);
+            res.send(result);
+        }
+        res.send([]);
+    } else if (type === 'M3USTREAM') {
+        const { url } = config.data[config.selected];
+        if (url) {
+            const channel = { id: 1, name: 'Stream ' + url, cmd: url };
+            const result = [channel];
+            // Return the result array
+            config.data[config.selected].data = result;
+            await db.put('config', config);
+            res.send(result);
+
+        }
+    }
+});
+
 app.get('/channels', async (req, res) => {
     try {
         const config = await db.get('config');
@@ -351,7 +329,10 @@ app.get('/channels', async (req, res) => {
             const { channel_list } = config.data[config.selected];
             do_handshake(url, mac);
             res.send(channel_list);
-        } else if (type === 'M3U') {
+        } else if (type === 'M3UPLAYLIST') {
+            const { data } = config.data[config.selected];
+            res.send(data);
+        } else if (type === 'M3USTREAM') {
             const { data } = config.data[config.selected];
             res.send(data);
         }
@@ -365,35 +346,46 @@ app.get('/channels', async (req, res) => {
 let callCounter = 0;
 
 app.post('/createLink', async (req, res) => {
-    try {
-        // Increment the call counter
-        callCounter++;
+    const config = await db.get('config');
+    const { type, url, mac } = config.data[config.selected];
+    if (type === 'STB') {
+        try {
+            // Increment the call counter
+            callCounter++;
 
-        // Check if the route has been called too many times
-        if (callCounter > 4) {
-            // Return an error or throw an exception to prevent further calls
-            callCounter = 0;
-            return res.status(500).send('Error: Maximum number of calls exceeded');
+            // Check if the route has been called too many times
+            if (callCounter > 4) {
+                // Return an error or throw an exception to prevent further calls
+                callCounter = 0;
+                return res.status(500).send('Error: Maximum number of calls exceeded');
+            }
+
+            const cmd = req.body.cmd;
+
+            fetch(url + `/server/load.php?type=itv&action=create_link&type=itv&cmd=${encodeURIComponent(cmd)}&JsHttpRequest=1-xml`, options)
+                // .then(response => response.text())  
+                .then(response => response.json())
+                .then(result => {
+                    const strs = result.js.cmd.split(' ');
+                    return strs[strs.length - 1];
+                })
+                .then(link => { res.send(link) })
+                .catch(error => {
+                    console.log('error', error)
+                    do_handshake(url, mac)
+                    app.post('/createLink')
+                })
         }
-
+        catch (error) {
+            console.log('error', error)
+        }
+    } else if (type === 'M3UPLAYLIST') {
         const cmd = req.body.cmd;
-
-        fetch(url + `/server/load.php?type=itv&action=create_link&type=itv&cmd=${encodeURIComponent(cmd)}&JsHttpRequest=1-xml`, options)
-            // .then(response => response.text())  
-            .then(response => response.json())
-            .then(result => {
-                const strs = result.js.cmd.split(' ');
-                return strs[strs.length - 1];
-            })
-            .then(link => { res.send(link) })
-            .catch(error => {
-                console.log('error', error)
-                do_handshake(url, mac)
-                app.post('/createLink')
-            })
+        res.send(cmd);
     }
-    catch (error) {
-        console.log('error', error)
+    else if (type === 'M3USTREAM') {
+        const cmd = req.body.cmd;
+        res.send(cmd);
     }
 });
 
@@ -445,16 +437,15 @@ app.get('/stream/:link*', function (req, res) {
         .outputOptions(outputOptions)
         .format('ismv')
         .on('error', (err) => {
-            console.log('ffmpeg error', err)
+            // console.log('ffmpeg error', err)
             ffmp.kill()
         })
         .on('end', (err) => {
-            console.log('ffmpeg end', err)
+            // console.log('ffmpeg end', err)
             ffmp.kill()
         })
         .pipe(res)
 })
-
 
 app.get('/', (req, res) => {
     res.send('Hello World!')

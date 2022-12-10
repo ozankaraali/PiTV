@@ -42,7 +42,7 @@ const App = () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "selected": 0,
+        "selected": 1,
         "data": [
           { "type": "STB", "url": serverUrl, "mac": macAddress },
           { "type": "STB", "url": "", "mac": "00:1A:79:xx:xx:xx", "channel_list": [] },
