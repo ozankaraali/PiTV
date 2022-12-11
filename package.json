@@ -1,6 +1,6 @@
 {
   "name": "PiTV",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A cross-platform STB (IPTV) player client.",
   "main": ".webpack/main",
   "scripts": {

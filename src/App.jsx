@@ -48,11 +48,7 @@ const App = () => {
     <div className="App" id="app">
       <div className="drag"></div>
       <div className="columns is-gapless is-reversed-mobile">
-        <ChannelList reload={
-          () => {
-            setReload(!reload) // TODO: better reload
-          }
-        }/>
+        <ChannelList reload={modalState}/>
         <div className="column">
           <div>
             <div className="buttons is-right">

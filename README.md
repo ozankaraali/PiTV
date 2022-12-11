@@ -1,6 +1,6 @@
-# PiTV - STB Client
+# PiTV - IPTV and STB Client
 
-A cross-platform STB player client.
+A cross-platform IPTV and STB player client.
 
 ## Installation
 
@@ -15,7 +15,8 @@ cd PiTV && yarn && yarn make
 
 ## Usage
 
-You need to enter your IPTV provider's details to Settings. When you save, if your authentication works, you will directly see the channel lists on the left side. Select a channel and it will begin shorty.
+You could use this software as a IPTV player or as a STB client. It bundles [a list of publicly available IPTV channels](https://github.com/iptv-org/iptv) from around the world for you to start quickly using or test the application. You can delete that playlist entry if you want from your computer after registering your playlists / STB player details.
+For further usage you need to enter your M3U Playlist or IPTV provider's STB player details to "Settings". When you save, if your authentication works, you will directly see the channel lists on the left side. Select a channel and it will begin shortly.
 
 <img width="1392" alt="Screen Shot 2021-03-04 at 00 20 09" src="https://user-images.githubusercontent.com/19486728/109873914-7aed6080-7c7f-11eb-8bae-2af2588b2bac.png">
 <img width="1392" alt="Screen Shot 2021-03-04 at 00 20 20" src="https://user-images.githubusercontent.com/19486728/109873933-7e80e780-7c7f-11eb-8bed-0000b17ec304.png">
