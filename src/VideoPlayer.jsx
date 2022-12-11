@@ -22,9 +22,16 @@ export default class VideoPlayer extends React.Component {
   // see https://github.com/videojs/video.js/pull/3856
   render() {
     return (
-      <div>	
+      <div>
         <div data-vjs-player>
-          <video ref={ node => this.videoNode = node } id="my-video" className="video-js no-drag" controls autoPlay preload="auto" data-setup='{"fluid": true}'></video>
+          <video
+            ref={node => this.videoNode = node}
+            id="my-video"
+            className="video-js no-drag"
+            controls
+            autoPlay
+            preload="auto"
+            data-setup='{"fluid": true, "controlBar": {"remainingTimeDisplay": false, "durationDisplay": false,"progressControl": false}}'></video>
         </div>
       </div>
     )
