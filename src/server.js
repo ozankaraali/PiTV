@@ -49,6 +49,10 @@ import ffmpegStatic from 'ffmpeg-static';
 //             "type": "M3UPLAYLIST",
 //             "url": "https://iptv-org.github.io/iptv/index.m3u"
 //         }
+//         {
+//             "type": "M3USTREAM",
+//             "url": "http://<URL>:8080/c/<CHANNEL_ID>/stream.m3u8"
+//         }
 //     ]
 // }
 // type: STB, M3UPLAYLIST, M3USTREAM
@@ -98,7 +102,16 @@ try {
     console.log("options", options)
 }
 catch (e) {
-    console.log("error", e)
+    let config = {
+        "selected": 0,
+        "data": [
+            {
+                "type": "M3UPLAYLIST",
+                "url": "https://iptv-org.github.io/iptv/index.m3u"
+            }
+        ]
+    }
+    db.put('config', config);
 }
 
 const do_handshake = async (url, mac) => {
@@ -294,27 +307,29 @@ app.get('/allChannels', async (req, res) => {
             // Split the text into lines
             const result = parseM3U(data);
             // Return the result array
-            config.data[config.selected].data = result;
-            await db.put('config', config);
+            // config.data[config.selected].data = result;
+            // await db.put('config', config);
             res.send(result);
 
         }
         else if (file) {
             const data = fs.readFileSync(file, 'utf8');
             const result = parseM3U(data);
-            config.data[config.selected].data = result;
-            await db.put('config', config);
+            // config.data[config.selected].data = result;
+            // await db.put('config', config);
             res.send(result);
         }
-        res.send([]);
+        else {
+            res.send([]);
+        }
     } else if (type === 'M3USTREAM') {
         const { url } = config.data[config.selected];
         if (url) {
             const channel = { id: 1, name: 'Stream ' + url, cmd: url };
             const result = [channel];
             // Return the result array
-            config.data[config.selected].data = result;
-            await db.put('config', config);
+            // config.data[config.selected].data = result;
+            // await db.put('config', config);
             res.send(result);
 
         }

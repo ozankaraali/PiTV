@@ -20,10 +20,12 @@ You need to enter your IPTV provider's details to Settings. When you save, if yo
 <img width="1392" alt="Screen Shot 2021-03-04 at 00 20 09" src="https://user-images.githubusercontent.com/19486728/109873914-7aed6080-7c7f-11eb-8bae-2af2588b2bac.png">
 <img width="1392" alt="Screen Shot 2021-03-04 at 00 20 20" src="https://user-images.githubusercontent.com/19486728/109873933-7e80e780-7c7f-11eb-8bed-0000b17ec304.png">
 
-## Future Work
+## Disclaimer
 
-- UI work will be done
-- Need to check Linux HWAccels
+This application bundles [a list of publicly available IPTV channels](https://github.com/iptv-org/iptv) from around the world. The channels are not hosted by this application or respective repository. The application simply creates a convenient way to browse a publicly available media database. The developer of this application has no affiliation with the content providers. The content provided can be removed at any time and we have no control over it. The developer assumes no liability and is not responsible for any legal issues caused by the misuse of this application.
+
+No video files are stored in this repository, the application bundles open-sourced [iptv-org](https://github.com/iptv-org/iptv) playlist for quick startup, users can delete that playlist entry if they want to from their computer. If any links/channels in this application infringe on your rights as a copyright holder, they may be removed by sending a [pull request](https://github.com/iptv-org/iptv/pulls) or opening an [issue](https://github.com/iptv-org/iptv/issues/new?assignees=freearhey&labels=removal+request&template=--removal-request.yml&title=Remove%3A+). However, note that we have **no control** over the destination of the link, and just removing the link from the playlist will not remove its contents from the web. Note that linking does not directly infringe copyright because no copy is made on the site providing the link, and thus this is **not** a valid reason to send a DMCA notice to GitHub. To remove this content from the web, you should contact the web host that's actually hosting the content (**not** GitHub, nor the maintainers of this repository).
+
 
 ## Contributing
 
