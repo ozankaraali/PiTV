@@ -57,6 +57,8 @@ import ffmpegStatic from 'ffmpeg-static';
 // }
 // type: STB, M3UPLAYLIST, M3USTREAM
 
+let serverload = "/server/load.php"
+
 const db = new ClassicLevel(
     electronapp.getPath("userData") +
     "/settings", { valueEncoding: 'json' }
@@ -80,7 +82,8 @@ let options = {
     headers: {
         'User-Agent': 'Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 2 rev: 250 Safari/533.3',
         'Accept-Charset': 'UTF-8,*;q=0.8',
-        'X-User-Agent': 'Model: MAG200; Link: Ethernet'
+        'X-User-Agent': 'Model: MAG200; Link: Ethernet',
+        'Content-Type': 'application/json'
     }
 }
 let url = null
@@ -116,7 +119,7 @@ catch (e) {
 
 const do_handshake = async (url, mac) => {
     try {
-        const fetchurl = url + `/server/load.php?type=stb&action=handshake&prehash=0&token=${token}&JsHttpRequest=1-xml`
+        const fetchurl = url + serverload + `?type=stb&action=handshake&prehash=0&token=${token}&JsHttpRequest=1-xml`
         const handshake = await fetch(fetchurl, options)
         // setCookie = await handshake.headers.get('set-cookie')
         const body = await handshake.json()
@@ -130,6 +133,10 @@ const do_handshake = async (url, mac) => {
         return options
     }
     catch (e) {
+        if (serverload != "/portal.php"){
+            serverload = "/portal.php"
+            do_handshake(url, mac)
+        }
         console.log("error", e)
     }
 }
@@ -281,11 +288,11 @@ app.get('/allChannels', async (req, res) => {
             console.log(url, mac)
             do_handshake(url, mac)
             // ALL CHANNELS WON'T RETURN UNLESS PROFILE
-            await fetch(url + '/server/load.php?type=stb&action=get_profile&stb_type=MAG250&sn=0000000000000&ver=ImageDescription%3a%200.2.16-250%3b%20ImageDate%3a%2018%20Mar%202013%2019%3a56%3a53%20GMT%2b0200%3b%20PORTAL%20version%3a%204.9.9%3b%20API%20Version%3a%20JS%20API%20version%3a%20328%3b%20STB%20API%20version%3a%20134%3b%20Player%20Engine%20version%3a%200x566&not_valid_token=0&auth_second_step=0&hd=1&num_banks=1&image_version=216&hw_version=1.7-BD-00', options)
+            await fetch(url + serverload + '?type=stb&action=get_profile&stb_type=MAG250&sn=0000000000000&ver=ImageDescription%3a%200.2.16-250%3b%20ImageDate%3a%2018%20Mar%202013%2019%3a56%3a53%20GMT%2b0200%3b%20PORTAL%20version%3a%204.9.9%3b%20API%20Version%3a%20JS%20API%20version%3a%20328%3b%20STB%20API%20version%3a%20134%3b%20Player%20Engine%20version%3a%200x566&not_valid_token=0&auth_second_step=0&hd=1&num_banks=1&image_version=216&hw_version=1.7-BD-00', options)
 
             const force_retry = (i) => {
                 if (i < 30) {
-                    fetch(url + "/server/load.php?type=itv&action=get_all_channels", options)
+                    fetch(url + serverload + "?type=itv&action=get_all_channels", options)
                         // .then(response => response.text())  
                         .then(response => response.json())
                         .then(result => res.send(result.js.data))
@@ -377,7 +384,7 @@ app.post('/createLink', async (req, res) => {
 
             const cmd = req.body.cmd;
 
-            fetch(url + `/server/load.php?type=itv&action=create_link&type=itv&cmd=${encodeURIComponent(cmd)}&JsHttpRequest=1-xml`, options)
+            fetch(url + serverload + `?type=itv&action=create_link&type=itv&cmd=${encodeURIComponent(cmd)}&JsHttpRequest=1-xml`, options)
                 // .then(response => response.text())  
                 .then(response => response.json())
                 .then(result => {
