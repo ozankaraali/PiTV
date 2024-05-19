@@ -32,6 +32,7 @@ jobs:
           export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
           # Add any other dependencies that you need to install here
           
+      - run: pip install distutils
       - run: yarn
       - run: yarn make
 
