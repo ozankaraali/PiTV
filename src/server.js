@@ -429,29 +429,14 @@ app.get('/stream/:link*', function (req, res) {
         '-reconnect_streamed 1',
         '-acodec aac',
         '-ac 2',
-        // '-ab 64k',
-        // '-vcodec libx264 -preset ultrafast -crf 23 -threads 0',
-        '-vcodec libx264',
-        '-preset ultrafast',
-        // '-g 100', 
-        // '-keyint_min 100',
-        // '-x264opts pic-struct:no-scenecut', 
-        // '-movflags frag_keyframe',
-        // '-b 400k', 
-        // '-s 640x480',
-        '-tune zerolatency',
-
-        // '-max_muxing_queue_size 9999',
-        // '-b:v 3000k', // Set the video bitrate to 1000 kilobits per second
-        // '-preset medium', // Use a lower-complexity encoding preset
-        // // '-threads 2', // Limit ffmpeg to using 2 threads
-        // '-hls_time 10', // Limit each output segment to 10 seconds
-        // // '-movflags +isml+frag_keyframe+faststart',
-        // // '-preset ultrafast',
-        '-movflags +isml+frag_keyframe+faststart',
-        // '-bufsize 12000k',
-        // '-movflags +isml+frag_keyframe', //
+        '-c:v copy',
+        '-hls_time 2', // Shorter segment duration
+        '-hls_playlist_type event', // Playlist type for live streaming
+        '-hls_flags delete_segments', // Delete old segments to save disk space
+        '-f hls' // Set output format to HLS
     ]
+
+    res.contentType('application/vnd.apple.mpegurl')
 
     ffmp
         .setFfmpegPath(ffmpegStatic)
