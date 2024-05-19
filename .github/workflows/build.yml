@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.8' 
         
       - name: Install Node.js, NPM and Yarn
         uses: actions/setup-node@v1
@@ -32,7 +35,6 @@ jobs:
           export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
           # Add any other dependencies that you need to install here
           
-      - run: pip install distutils
       - run: yarn
       - run: yarn make
 
