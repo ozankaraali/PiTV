@@ -33,6 +33,10 @@ No video files are stored in this repository, the application bundles open-sourc
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 This project is in early phase. If you want to change any function, feel free to do. You could refactor, propose architecture changes, design assets, add new features, provide CI/CD things and build for other platforms. Basically, all changes that can improve this software are welcome.
+## Acknowledgements
+
+### FFmpeg
+This software uses code of <a href=http://ffmpeg.org>FFmpeg</a> licensed under the <a href=http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html>LGPLv2.1</a> and its source can be downloaded <a href=https://github.com/ozankaraali/PiTV>here</a>
 
 ## License
 
