@@ -2,6 +2,8 @@
 
 A cross-platform IPTV and STB player client.
 
+#### If you like this software, I strongly suggest you to take a look at [QiTV](https://github.com/ozankaraali/QiTV) too.
+
 ## Installation
 
 You could download the software from [RELEASES](https://github.com/ozankaraali/PiTV/releases).
