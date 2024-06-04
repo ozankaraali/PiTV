@@ -1,8 +1,10 @@
 # PiTV - IPTV and STB Client
 
+## Please always download this free software from [RELEASES](https://github.com/ozankaraali/PiTV/releases) instead of using others' distributions, which may have malware.
+
 A cross-platform IPTV and STB player client.
 
-#### If you like this software, I strongly suggest you to take a look at [QiTV](https://github.com/ozankaraali/QiTV) too.
+### If you like this software, I strongly suggest you to take a look at [QiTV](https://github.com/ozankaraali/QiTV) too, which is recently developed, a bit more stable software.
 
 ## Installation
 
