@@ -1,21 +1,25 @@
 # PiTV - IPTV and STB Client
 
-## Please always download this free software from [RELEASES](https://github.com/ozankaraali/PiTV/releases) instead of using others' distributions, which may have malware.
+> **This project is archived and no longer maintained.**
+>
+> PiTV has been succeeded by **[QiTV](https://github.com/ozankaraali/QiTV)**, a free, open-source IPTV player for Windows, macOS and Linux. It does everything PiTV did (M3U playlists, STB portals, built-in free channels) and adds Xtream accounts, free channel lists by country, support for multiple languages, and pause, rewind and record for live TV.
+>
+> **Download QiTV at [qitv.app](https://qitv.app)** or from its [GitHub releases](https://github.com/ozankaraali/QiTV/releases).
 
-A cross-platform IPTV and STB player client.
+## Status
 
-### If you like this software, I strongly suggest you to take a look at [QiTV](https://github.com/ozankaraali/QiTV) too, which is recently developed, a bit more stable software.
+PiTV was developed from 2021 to 2024 as a cross-platform IPTV and STB player client built with Electron, React and FFmpeg. It will not receive any more releases, bug fixes or security updates, and the repository is read-only. If you have a bug report or feature request, please open it on [QiTV](https://github.com/ozankaraali/QiTV/issues) instead.
 
-## Installation
+The old builds are kept on [RELEASES](https://github.com/ozankaraali/PiTV/releases) for reference. They are built on an end-of-life version of Electron, so I recommend using QiTV instead. If you do download PiTV, only get it from that page and not from others' distributions, which may contain malware.
 
-You could download the software from [RELEASES](https://github.com/ozankaraali/PiTV/releases).
-
-Alternatively, you could do:
+## Building from source
 
 ```
 git clone https://github.com/ozankaraali/PiTV/
 cd PiTV && yarn && yarn make
 ```
+
+CI last built it with Node 19 and Python 3.8. Newer toolchains may need some tweaks.
 
 ## Usage
 
@@ -31,12 +35,6 @@ This application bundles [a list of publicly available IPTV channels](https://gi
 
 No video files are stored in this repository, the application bundles open-sourced [iptv-org](https://github.com/iptv-org/iptv) playlist for quick startup, users can delete that playlist entry if they want to from their computer. If any links/channels in this application infringe on your rights as a copyright holder, they may be removed by sending a [pull request](https://github.com/iptv-org/iptv/pulls) or opening an [issue](https://github.com/iptv-org/iptv/issues/new?assignees=freearhey&labels=removal+request&template=--removal-request.yml&title=Remove%3A+). However, note that we have **no control** over the destination of the link, and just removing the link from the playlist will not remove its contents from the web. Note that linking does not directly infringe copyright because no copy is made on the site providing the link, and thus this is **not** a valid reason to send a DMCA notice to GitHub. To remove this content from the web, you should contact the web host that's actually hosting the content (**not** GitHub, nor the maintainers of this repository).
 
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-This project is in early phase. If you want to change any function, feel free to do. You could refactor, propose architecture changes, design assets, add new features, provide CI/CD things and build for other platforms. Basically, all changes that can improve this software are welcome.
 ## Acknowledgements
 
 ### FFmpeg
@@ -49,3 +47,5 @@ This software licensed under [MIT](https://github.com/ozankaraali/PiTV/blob/main
 ## Special Thanks
 
 I want to thank people who supported me while creating this software: My family and Şamil, Alperen, Fatih, Deniz.
+
+Thank you as well to everyone who used PiTV, reported issues and sent pull requests over the years. The journey continues with [QiTV](https://qitv.app).
